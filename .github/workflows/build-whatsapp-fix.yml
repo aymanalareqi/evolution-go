@@ -1,0 +1,24 @@
+name: Build patched Evolution GO
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    env:
+      IMAGE: ghcr.io/yourusername/evolution-go-whatsapp-fix:fix-1
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Build and publish
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          docker build --build-arg VERSION=0.7.2-wa-fix-1 -t "$IMAGE" .
+          docker push "$IMAGE"
